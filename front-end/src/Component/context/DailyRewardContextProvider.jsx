@@ -257,9 +257,8 @@ function DailyRewardContextProvider(props) {
   // here i set the initial value of total reward
   const [reward, setReward] = useState(0);
 
-  const [findingRedeem, setFindingRedeem] = useState(null);
-
-  const [showcheckcard, setShowCheckCard] = useState(false);
+  const [findingRedeemArray, setFindingRedeemArray] = useState(null);
+  const [singleRedeem, setSingleRedeem] = useState({});
 
   // states end here
   // The logic for creating the Random Array to find the matching elements form Additionalarry
@@ -280,20 +279,25 @@ function DailyRewardContextProvider(props) {
   const handleReward = (coin) => {
     setReward((prevReward) => prevReward + coin);
   };
+
   const handleRedeem = (id) => {
     const findRedeem = redeemReward.find((item) => item.id === id).deductAmount;
     const deductSpecificAmount = findRedeem * 1000;
+
     if (reward <= deductSpecificAmount) {
-      console.log('amount is lower than');
+      console.log('Amount is lower than required to redeem');
     } else {
       setReward((prevReward) => prevReward - deductSpecificAmount);
-      setFindingRedeem(matchedArray);
-
-      const matchedElement = findingRedeem?.filter((item) => item.id === id);
-      console.log(matchedElement);
+      setFindingRedeemArray(matchedArray);
+      const matchedElement = matchedArray?.find((item) => item.id === id);
+      if (matchedElement) {
+        setSingleRedeem(matchedElement);
+      } else {
+        console.log('No match found');
+        setSingleRedeem({});
+      }
     }
   };
-
   return (
     <div>
       <createdailyrewardcontext.Provider
@@ -304,7 +308,8 @@ function DailyRewardContextProvider(props) {
           reward,
           redeemReward,
           handleRedeem,
-          findingRedeem,
+          findingRedeemArray,
+          singleRedeem,
         }}
       >
         {props.children}

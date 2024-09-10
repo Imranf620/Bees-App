@@ -1,28 +1,40 @@
 import React, { useState } from 'react';
 import { FaRegCircle } from 'react-icons/fa';
 import { CiBitcoin } from 'react-icons/ci';
-import Hamster1 from '../../images/Hamster1.png';
 import { useDailyRewardHook } from '../context/DailyRewardContextProvider';
 import { ImCross } from 'react-icons/im';
 
 function DailyCombo() {
-  const { reward, redeemReward, handleRedeem, findingRedeem } =
-    useDailyRewardHook();
+  const {
+    reward,
+    redeemReward,
+    handleRedeem,
+    findingRedeemArray,
+    matchedElement,
+    singleRedeem,
+  } = useDailyRewardHook();
   const [showCard, setShowCard] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
 
   const openModal = (id) => {
-    setShowCard(true);
-    setSelectedId(id); // Store the selected ID when opening modal
+    const findRedeem = redeemReward.find((item) => item.id === id).level;
+
+    if (reward > 1000 && findRedeem > 1) {
+      setShowCard(true);
+      setSelectedId(id);
+    }
   };
 
   const triggerRedeem = () => {
     setShowCard(false);
+    console.log(findingRedeemArray);
+    console.log(matchedElement);
     if (selectedId !== null) {
-      handleRedeem(selectedId); // Trigger redeem with selected ID
+      handleRedeem(selectedId);
     }
   };
 
+  console.log(singleRedeem);
   return (
     <>
       <div className='h-[88vh] w-full bg-[#0c0c1d] overflow-hidden overflow-y-auto'>
@@ -39,9 +51,43 @@ function DailyCombo() {
               <p className='text-[#fff] font-semibold text-[14px]'>+5000000</p>
             </div>
           </div>
-          <div className='flex gap-1.5 justify-center items-center w-[95%] mx-auto'>
-            {findingRedeem?.map((item) => {
-              console.log(item);
+
+          {/* Here is my three cards which i want to flip if one of them match if the findingRedeemArray have the singleRedeem item then the card should flip and show the result else do nothing  */}
+          {reward && (
+            <div className='flex gap-1.5 justify-center items-center w-[95%] mx-auto'>
+              {findingRedeemArray?.map((item) => {
+                const { id, title, image, price } = item;
+
+                return (
+                  <div
+                    key={id}
+                    className={`flex justify-center items-center bg-[#26263a] h-[80px] w-[33%] text-white border-yellow-600 shadowdiv1 rounded-lg border-[2px] border-b-0 `}
+                  >
+                    {singleRedeem?.id === id ? (
+                      // Show card content when flipped
+                      <div className='card-content'>
+                        <img
+                          src={image}
+                          alt={title}
+                          className='w-[50px] h-[50px]'
+                        />
+                        <p className='text-lg font-semibold'>{title}</p>
+                        <p className='text-sm'>Price: {price}</p>
+                      </div>
+                    ) : (
+                      // Show question mark when not flipped
+                      <p className='text-5xl font-semibold text-yellow-600'>
+                        ?
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* <div className='flex gap-1.5 justify-center items-center w-[95%] mx-auto'>
+            {findingRedeemArray?.map((item) => {
               const { id, title, image, price } = item;
 
               return (
@@ -50,7 +96,7 @@ function DailyCombo() {
                 </div>
               );
             })}
-          </div>
+          </div> */}
 
           <div className='flex items-center justify-center gap-2'>
             <CiBitcoin className='text-[40px] text-[#fff] bg-[#e9a830] rounded-full' />
@@ -76,7 +122,7 @@ function DailyCombo() {
 
           <div className='grid grid-cols-2 gap-2  w-[95%] mx-auto '>
             {/* Mapping over the array comming from dailyRewardContext  */}
-            {redeemReward.map((item) => {
+            {redeemReward?.map((item) => {
               const { id, title, image, price, level, deductAmount } = item;
 
               return (
