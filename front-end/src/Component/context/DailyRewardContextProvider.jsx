@@ -256,7 +256,7 @@ function DailyRewardContextProvider(props) {
 
   // here i set the initial value of total reward
   const [reward, setReward] = useState(0);
-
+  const [navAmount, setNavAmount] = useState(50000);
   const [findingRedeemArray, setFindingRedeemArray] = useState(null);
   const [singleRedeem, setSingleRedeem] = useState({});
 
@@ -287,14 +287,16 @@ function DailyRewardContextProvider(props) {
     if (reward <= deductSpecificAmount) {
       console.log('Amount is lower than required to redeem');
     } else {
-      setReward((prevReward) => prevReward - deductSpecificAmount);
       setFindingRedeemArray(matchedArray);
       const matchedElement = matchedArray?.find((item) => item.id === id);
       if (matchedElement) {
+        console.log(matchedElement);
+        setNavAmount(navAmount + matchedElement.price);
         setSingleRedeem(matchedElement);
       } else {
         console.log('No match found');
         setSingleRedeem({});
+        setReward((prevReward) => prevReward - deductSpecificAmount);
       }
     }
   };
@@ -310,6 +312,7 @@ function DailyRewardContextProvider(props) {
           handleRedeem,
           findingRedeemArray,
           singleRedeem,
+          navAmount,
         }}
       >
         {props.children}
